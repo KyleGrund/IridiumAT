@@ -19,6 +19,8 @@
         <module name="IridiumAT" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="8">
+      <module name="IridiumAT" target="1.10" />
+    </bytecodeTargetLevel>
   </component>
 </project>

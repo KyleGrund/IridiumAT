@@ -7,25 +7,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implements the Display Registers command.
+ * Implements the Radio Activity command.
  */
-public class ModelIdentification extends AtCommand{
-    /**
-     * The key used in the parsed map for the model identification string.
-     */
-    public static final String MODEL_IDENTIFICATION = "Model Identification";
-
+public class RadioActivity extends AtCommand{
     /**
      * The AT command String to send to the ISU.
      */
-    private static final String COMMAND = "AT+CGMM\r\n";
+    private static final String COMMAND = "AT*R";
 
     /**
      * Initializes a new instance of the AtCommand class.
      *
      * @param commEndpoint Callback used to have this command executed by the ISU.
      */
-    public ModelIdentification(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
+    public RadioActivity(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
         super(commEndpoint);
     }
 
@@ -37,8 +32,6 @@ public class ModelIdentification extends AtCommand{
     @Override
     protected CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException> execute(Map<String, String> parameters) {
         return (CheckedConsumer<String, IOException> sendLine, CheckedSupplier<String, IOException> receiveLine) -> {
-            Map<String, String> parsedData = new HashMap<>();
-
             // send command
             sendLine.accept(COMMAND);
 
@@ -51,18 +44,15 @@ public class ModelIdentification extends AtCommand{
 
             // get extra newline char
             if (!"".equals(resp = receiveLine.get())) {
-                throw new IOException("Expected OK response not received, got: \"" + resp + "\" instead.");
+                throw new IOException("Expected new line not received, got: \"" + resp + "\" instead.");
             }
-
-            // response is simply version string
-            parsedData.put(MODEL_IDENTIFICATION, receiveLine.get());
 
             // response should simply be OK
             if (!"OK".equals(resp = receiveLine.get())) {
                 throw new IOException("Expected OK response not received, got: \"" + resp + "\" instead.");
             }
 
-            return parsedData;
+            return new HashMap<>();
         };
     }
 }

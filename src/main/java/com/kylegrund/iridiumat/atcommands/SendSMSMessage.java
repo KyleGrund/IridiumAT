@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implements the Display Registers command.
+ * Implements the Send SMS Message command.
  */
-public class DisplayRegisters extends AtCommand{
+public class SendSMSMessage extends AtCommand{
     /**
      * The AT command String to send to the ISU.
      */
-    private static final String COMMAND = "AT%R\r\n";
+    private static final String COMMAND = "AT+CMGS=";
 
     /**
      * Initializes a new instance of the AtCommand class.
      *
      * @param commEndpoint Callback used to have this command executed by the ISU.
      */
-    public DisplayRegisters(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
+    public SendSMSMessage(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
         super(commEndpoint);
     }
 

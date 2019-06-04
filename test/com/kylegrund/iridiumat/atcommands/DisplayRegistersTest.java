@@ -1,6 +1,7 @@
 package com.kylegrund.iridiumat.atcommands;
 
 import com.kylegrund.iridiumat.ResponseParseError;
+import org.junit.Assert;
 
 import java.util.Map;
 
@@ -10,7 +11,8 @@ import static org.junit.Assert.fail;
 public class DisplayRegistersTest {
     @org.junit.Test
     public void getCommandString() {
-        assertEquals("AT%R\n", new DisplayRegisters().getCommandString());
+        //assertEquals("AT%R\n", new DisplayRegisters().getCommandString());
+        Assert.fail();
     }
 
     @org.junit.Test
@@ -153,12 +155,13 @@ public class DisplayRegistersTest {
 
         Map<String, String> result = null;
 
-        try {
+        /*try {
             result = new DisplayRegisters().parseResponse(response.toString());
         } catch (ResponseParseError ex) {
             fail(ex.getLocalizedMessage());
         }
 
-        assertEquals(129, result.size());
+        assertEquals(129, result.size());*/
+        Assert.fail();
     }
 }
