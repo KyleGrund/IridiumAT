@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implements test for the Display Registers command.
+ * Implements tests for the Send SMS Message command.
  */
-public class DisplayRegistersTest extends AtCommandTest {
+public class SendSMSMessageTest extends AtCommandTest{
     @Override
     public void testCommand(AtCommand command) throws Exception{
         command.executeCommand(command.getParameters());
