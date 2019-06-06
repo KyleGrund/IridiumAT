@@ -23,14 +23,21 @@ public class Motorola9575 extends SubscriberUnit {
     private final CheckedSupplier<String, IOException> receiveLine;
 
     /**
+     * The function to call to dispose underlying unmanaged resources.
+     */
+    private final Runnable disposeMethod;
+
+    /**
      * Initializes a new instance of the Motorola9575 class.
      *
      * @param sendLine    A function which sends the provided String to the associated ISU.
      * @param receiveLine A function which returns a String read from the associated ISU.
+     * @param disposeMethod The method to call to dispose unmanaged resources.
      */
-    Motorola9575(CheckedConsumer<String, IOException> sendLine, CheckedSupplier<String, IOException> receiveLine) {
+    Motorola9575(CheckedConsumer<String, IOException> sendLine, CheckedSupplier<String, IOException> receiveLine, Runnable disposeMethod) {
         this.sendLine = sendLine;
         this.receiveLine = receiveLine;
+        this.disposeMethod = disposeMethod;
 
         Map<String, AtCommand> commands = new HashMap<>();
 
@@ -43,6 +50,12 @@ public class Motorola9575 extends SubscriberUnit {
     @Override
     public Map<String, AtCommand> getCommands() {
         return this.commands;
+    }
+
+    @Override
+    public void close() {
+        // run the dispose method to clean up unmanaged resources
+        this.disposeMethod.run();
     }
 
     /**

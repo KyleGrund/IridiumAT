@@ -3,6 +3,7 @@ package com.kylegrund.iridiumat;
 import org.junit.Assert;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public abstract class AtCommandTest {
     /**
@@ -25,13 +26,28 @@ public abstract class AtCommandTest {
             Assert.fail("Could not find test class for command of type: \"" + className + "\".");
         }
 
+        // try to get instantiate new instance
+        AtCommandTest cmdInstance = null;
+        try {
+            cmdInstance = (AtCommandTest)found.getConstructor().newInstance();
+        } catch (Exception e) {
+            Assert.fail("Could not instantiate new instance of the class: \"" + className + "\".");
+        }
+
+        // try to find test method
+        Method testMethod = null;
+        try {
+            testMethod = found.getMethod("testCommand", AtCommand.class);
+        } catch (Exception e) {
+            Assert.fail("Could not find testCommand method on test class type: \"" + found.getName() + "\".");
+        }
+
         // try to execute test method
         try {
-            found.getMethod("testCommand", AtCommand.class).invoke(found.getConstructor().newInstance(), command);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            Assert.fail("Could not find testCommand method on test class type: \"" + found.getName() + "\".");
-        } catch (Exception e) {
-            Assert.fail("Test failed with Exception: \"" + e.getMessage() + "\".");
+            testMethod.invoke(cmdInstance, command);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            Assert.fail("Exception executing test method for class: \"" + found.getName() + "\".");
         }
     }
 }
