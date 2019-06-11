@@ -2,6 +2,7 @@ package com.kylegrund.iridiumat;
 
 import com.kylegrund.iridiumat.atcommands.DisplayRegisters;
 import com.kylegrund.iridiumat.atcommands.ModelIdentification;
+import com.kylegrund.iridiumat.atcommands.Reboot;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,9 +63,16 @@ public class SubscriberUnitTest {
 
         for (SubscriberUnit unit : toTest) {
             Collection<AtCommand> commands = unit.getCommands().values();
-            for (AtCommand command : commands) {
-                AtCommandTest.Dispatch(command);
-            }
+
+            // test all commands except reboot
+            commands.stream()
+                    .filter(cmd -> !cmd.getClass().getName().equals(Reboot.class.getName()))
+                    .forEach(AtCommandTest::Dispatch);
+
+            // test reboot command
+            commands.stream()
+                    .filter(cmd -> cmd.getClass().getName().equals(Reboot.class.getName()))
+                    .forEach(AtCommandTest::Dispatch);
         }
     }
 

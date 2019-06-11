@@ -1,7 +1,6 @@
 package com.kylegrund.iridiumat;
 
-import com.kylegrund.iridiumat.atcommands.DisplayRegisters;
-import com.kylegrund.iridiumat.atcommands.ModelIdentification;
+import com.kylegrund.iridiumat.atcommands.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -41,8 +40,14 @@ public class Motorola9575 extends SubscriberUnit {
 
         Map<String, AtCommand> commands = new HashMap<>();
 
+        // add all commands the 9575 radio supports
+        commands.put(BatteryCharge.class.getName(), new BatteryCharge(this::execute));
         commands.put(DisplayRegisters.class.getName(), new DisplayRegisters(this::execute));
+        commands.put(FactoryReset.class.getName(), new FactoryReset(this::execute));
         commands.put(ModelIdentification.class.getName(), new ModelIdentification(this::execute));
+        // commands.put(PowerPhone.class.getName(), new PowerPhone(this::execute));
+        // commands.put(RadioActivity.class.getName(), new RadioActivity(this::execute));
+        commands.put(Reboot.class.getName(), new Reboot(this::execute));
 
         this.commands = Collections.unmodifiableMap(commands);
     }

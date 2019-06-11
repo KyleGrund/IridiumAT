@@ -12,6 +12,12 @@ import java.util.Map;
 public class RadioActivityTest extends AtCommandTest {
     @Override
     public void testCommand(AtCommand command) throws Exception{
-        command.executeCommand(command.getParameters());
+        Map<String, String> params = command.getParameters();
+        params.put("Enable", "1");
+        command.executeCommand(params);
+        params.put("Enable", "0");
+        command.executeCommand(params);
+        params.put("Enable", "1");
+        command.executeCommand(params);
     }
 }
