@@ -22,6 +22,7 @@ public abstract class SubscriberUnit {
      * The timeout for writing to the serial port in milliseconds.
      */
     private static final int SERIAL_WRITE_TIMEOUT_MS = 1000;
+
     /**
      * Gets a list of commands the ISU supports.
      * @return A list of commands the ISU supports.
@@ -63,7 +64,7 @@ public abstract class SubscriberUnit {
                 int toRead;
                 while ((toRead = port.getInputStream().available()) > 0) {
                     byte[] buff = new byte[toRead];
-                    port.getInputStream().read(buff, 0, toRead);
+                    int result = port.getInputStream().read(buff, 0, toRead);
                 }
 
                 // create writer for communications to ISU
@@ -76,10 +77,10 @@ public abstract class SubscriberUnit {
                 Runnable dispose = port::closePort;
 
                 // AT command which resets ISU to factory defaults
-                AtCommand factoryReset = new FactoryReset((func) -> func.accept(sendLine, receiveLine));
+                AtCommand factoryReset = new FactoryReset((func) -> func.accept(sendLine, receiveLine), () -> false);
 
                 // AT command which gets ISU model number
-                AtCommand modelIdentification = new ModelIdentification((func) -> func.accept(sendLine, receiveLine));
+                AtCommand modelIdentification = new ModelIdentification((func) -> func.accept(sendLine, receiveLine), () -> true);
 
                 factoryReset.executeCommand(factoryReset.getParameters());
                 Map<String, String> response = modelIdentification.executeCommand(factoryReset.getParameters());
@@ -113,7 +114,7 @@ public abstract class SubscriberUnit {
             CheckedConsumer<String, IOException> sendLine,
             CheckedSupplier<String, IOException> receiveLine,
             Runnable disposeMethod,
-            String idString) {
+            String idString) throws Exception {
         if (idString.startsWith("9575")) {
             return new Motorola9575(sendLine, receiveLine, disposeMethod);
         }

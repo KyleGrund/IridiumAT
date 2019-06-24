@@ -6,20 +6,23 @@ package com.kylegrund.iridiumat;
  * to operate via side-effects.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #accept(Object, Object)}.
+ * whose functional method is {@link #accept(Object, Object, Object)}.
  *
  * @param <T> the type of the first input to the operation
  * @param <U> the type of the second input to the operation
+ * @param <V> the type of the third input to the operation
+ * @param <R> the type of the return
  * @param <E> the type of the Exception the operation can throw
  */
 @FunctionalInterface
-public interface CheckedDoubleConsumer<T, U, E extends Exception> {
+public interface CheckedTripleFunction<T, U, V, R, E extends Exception> {
 
     /**
      * Performs this operation on the given argument.
      *
-     * @param t the firtst input argument
-     * @param u the second input argrument.
+     * @param t the first input argument
+     * @param u the second input argument.
+     * @param v the third input argument.
      */
-    void accept(T t, U u) throws E;
+    R accept(T t, U u, V v) throws E;
 }

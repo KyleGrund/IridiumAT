@@ -1,9 +1,8 @@
 package com.kylegrund.iridiumat;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -11,16 +10,27 @@ import java.util.function.Supplier;
  */
 public abstract class AtCommand {
     /**
+     * The key used by the AtCommand implementations to determine if local echo is enabled.
+     */
+    protected final String ECHO_ENABLED_KEY = "__echoEnabled";
+
+    /**
      * Sends the provided String to the associated ISU.
      */
     private final CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint;
 
     /**
+     * Gets a value indicating whether the ISU's local echo is enabled.
+     */
+    private final Supplier<Boolean> getEchoEnabled;
+
+    /**
      * Initializes a new instance of the AtCommand class.
      * @param commEndpoint The interface used to communicate with the ISU.
      */
-    protected AtCommand(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint){
+    protected AtCommand(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint, Supplier<Boolean> getEchoEnabled){
         this.commEndpoint = commEndpoint;
+        this.getEchoEnabled = getEchoEnabled;
     }
 
     /**
@@ -37,6 +47,14 @@ public abstract class AtCommand {
      */
     public Map<String, String> executeCommand(Map<String, String> parameters) throws IOException {
         return commEndpoint.accept(this.execute(parameters));
+    }
+
+    /**
+     * Returns a boolean value indicating whether to expect the ISU to echo commands back to DTE.
+     * @return  A boolean value indicating whether to expect the ISU to echo commands back to DTE.
+     */
+    protected Boolean getEchoEnabled() {
+        return this.getEchoEnabled.get();
     }
 
     /**

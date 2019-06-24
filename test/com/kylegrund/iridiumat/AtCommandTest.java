@@ -5,6 +5,9 @@ import org.junit.Assert;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Class providing testing dispatch for AtCommand implementing classes.
+ */
 public abstract class AtCommandTest {
     /**
      * Runs a test for the given command
@@ -25,6 +28,8 @@ public abstract class AtCommandTest {
         } catch (ClassNotFoundException e) {
             Assert.fail("Could not find test class for command of type: \"" + className + "\".");
         }
+
+        System.out.println("Dispatching for class: " + className);
 
         // try to get instantiate new instance
         AtCommandTest cmdInstance = null;

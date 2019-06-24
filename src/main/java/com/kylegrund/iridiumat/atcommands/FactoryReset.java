@@ -5,6 +5,7 @@ import com.kylegrund.iridiumat.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Implements the Display Registers command.
@@ -16,12 +17,14 @@ public class FactoryReset extends AtCommand{
     private static final String COMMAND = "AT&F0\r\n";
 
     /**
-     * Initializes a new instance of the AtCommand class.
+     * Initializes a new instance of the FactoryReset class.
      *
      * @param commEndpoint Callback used to have this command executed by the ISU.
+     * @param getEchoEnabled A function which returns a boolean value indicating whether to expect a command echo from the ISU.
      */
-    public FactoryReset(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
-        super(commEndpoint);
+    public FactoryReset(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint,
+                     Supplier<Boolean> getEchoEnabled) {
+        super(commEndpoint, getEchoEnabled);
     }
 
     @Override

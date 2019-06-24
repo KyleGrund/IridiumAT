@@ -1,6 +1,7 @@
 package com.kylegrund.iridiumat;
 
 import com.kylegrund.iridiumat.atcommands.DisplayRegisters;
+import com.kylegrund.iridiumat.atcommands.FactoryReset;
 import com.kylegrund.iridiumat.atcommands.ModelIdentification;
 import com.kylegrund.iridiumat.atcommands.Reboot;
 import org.junit.After;
@@ -64,9 +65,16 @@ public class SubscriberUnitTest {
         for (SubscriberUnit unit : toTest) {
             Collection<AtCommand> commands = unit.getCommands().values();
 
-            // test all commands except reboot
+            // perform factory reset first
             commands.stream()
-                    .filter(cmd -> !cmd.getClass().getName().equals(Reboot.class.getName()))
+                    .filter(cmd -> cmd.getClass().getName().equals(FactoryReset.class.getName()))
+                    .forEach(AtCommandTest::Dispatch);
+
+            // test all commands except reboot and reset
+            commands.stream()
+                    .filter(cmd ->
+                            !cmd.getClass().getName().equals(Reboot.class.getName()) &&
+                            !cmd.getClass().getName().equals(FactoryReset.class.getName()))
                     .forEach(AtCommandTest::Dispatch);
 
             // test reboot command

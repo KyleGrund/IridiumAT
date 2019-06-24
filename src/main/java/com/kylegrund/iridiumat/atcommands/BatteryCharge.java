@@ -5,6 +5,7 @@ import com.kylegrund.iridiumat.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Implements the Battery Charge command.
@@ -21,12 +22,14 @@ public class BatteryCharge extends AtCommand{
     private static final String RESP = "+CBC";
 
     /**
-     * Initializes a new instance of the AtCommand class.
+     * Initializes a new instance of the BatteryCharge class.
      *
      * @param commEndpoint Callback used to have this command executed by the ISU.
+     * @param getEchoEnabled A function which returns a boolean value indicating whether to expect a command echo from the ISU.
      */
-    public BatteryCharge(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint) {
-        super(commEndpoint);
+    public BatteryCharge(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint,
+                Supplier<Boolean> getEchoEnabled) {
+        super(commEndpoint, getEchoEnabled);
     }
 
     @Override

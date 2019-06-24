@@ -5,16 +5,17 @@ import com.kylegrund.iridiumat.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * Implements the Radio Activity command.
+ * Implements the Echo command.
  */
-public class RadioActivity extends AtCommand{
+public class Echo extends AtCommand{
     /**
      * The AT command String to send to the ISU.
      */
-    private static final String COMMAND = "AT*R";
+    private static final String COMMAND = "ATE";
 
     /**
      * The key in the properties associated with the enabled property.
@@ -22,14 +23,21 @@ public class RadioActivity extends AtCommand{
     private static final String ENABLED_KEY = "Enable";
 
     /**
-     * Initializes a new instance of the RadioActivity class.
+     * Callback used to notify the ISU implementation of changes to the echo state.
+     */
+    private final Consumer<Boolean> setEchoEnabled;
+
+    /**
+     * Initializes a new instance of the AtCommand class.
      *
      * @param commEndpoint Callback used to have this command executed by the ISU.
      * @param getEchoEnabled A function which returns a boolean value indicating whether to expect a command echo from the ISU.
      */
-    public RadioActivity(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint,
-                         Supplier<Boolean> getEchoEnabled) {
+    public Echo(CheckedFunction<CheckedDoubleFunction<CheckedConsumer<String, IOException>, CheckedSupplier<String, IOException>, Map<String, String>, IOException>, Map<String, String>, IOException> commEndpoint,
+                Supplier<Boolean> getEchoEnabled,
+                Consumer<Boolean> setEchoEnabledCallback) {
         super(commEndpoint, getEchoEnabled);
+        this.setEchoEnabled = setEchoEnabledCallback;
     }
 
     @Override
@@ -44,14 +52,12 @@ public class RadioActivity extends AtCommand{
         return (CheckedConsumer<String, IOException> sendLine, CheckedSupplier<String, IOException> receiveLine) -> {
             // check for enable property
             if (!parameters.containsKey(ENABLED_KEY)) {
-                throw new IOException("Could not execute Radio Activity command, the " + ENABLED_KEY + " key wsa not defined.");
+                throw new IOException("Could not execute Echo command, the " + ENABLED_KEY + " key wsa not defined.");
             }
 
             // parse enable property
-            int enable = 0;
-            if (Boolean.parseBoolean(parameters.get(ENABLED_KEY))) {
-                enable = 1;
-            }
+            boolean toEnable = Boolean.parseBoolean(parameters.get(ENABLED_KEY));
+            String enable = (toEnable) ? "1" : "0";
 
             // send command
             String toSend = COMMAND + enable + "\r\n";
@@ -59,8 +65,12 @@ public class RadioActivity extends AtCommand{
 
             // check response from ISU
             String resp;
-            if (!toSend.startsWith(resp = receiveLine.get())) {
-                throw new IOException("Expected command echo: \"" + toSend + "\" not received, got: \"" + resp + "\" instead.");
+
+            if (this.getEchoEnabled()) {
+                // check command echo was correct
+                if (!toSend.startsWith(resp = receiveLine.get())) {
+                    throw new IOException("Expected command echo: \"" + toSend + "\" not received, got: \"" + resp + "\" instead.");
+                }
             }
 
             // get extra newline char
@@ -72,6 +82,9 @@ public class RadioActivity extends AtCommand{
             if (!"OK".equals(resp = receiveLine.get())) {
                 throw new IOException("Expected OK response not received, got: \"" + resp + "\" instead.");
             }
+
+            // update state in ISU implementation
+            this.setEchoEnabled.accept(toEnable);
 
             return new HashMap<>();
         };
